@@ -28,7 +28,7 @@ int main(int argc, char **argv)
     {
         pid = fork();
 
-        if (pid < 0)
+        if (pid < 0) // con pid < 0 la fork non è andata a buon fine, errore grave dal SO
         {
             perror("fork");
             exit(3);
@@ -44,14 +44,14 @@ int main(int argc, char **argv)
             close(fd);
 
             printf("\n Numero di righe in cui compare la stringa %s:\n", argv[i]);
-            execlp("grep", "grep", "-c", argv[i], argv[1], (char *)0); // chiamata a grep -c stringa nomefile, funziona senza ritorno
+            execlp("grep", "grep", "-c", argv[i], argv[1], (char *)0); // chiamata a grep -c stringa nomefile, nullpointer. funziona senza ritorno
             perror("exec");                                            // errore nell'esecuzione di execlp
             exit(4);
         }
         // se sono qui sono il padre
-    }
-    // se sono qui sono il PADRE e ho finito di avviare processi figli
-    for (i = 2; i < argc; i++)
+    } // alla fine di questo for abbiamo N+1 processi attivi, il processo padre e gli N processi figli che sono stati eseguiti
+
+    for (i = 2; i < argc; i++) // se sono qui sono il PADRE e ho finito di avviare processi figli
     {
         /* Attendo la terminazione di uno dei figli */
         wait(&status);
